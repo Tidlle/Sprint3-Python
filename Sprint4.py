@@ -1,20 +1,5 @@
-"""
-HC APP (Oracle) – Pacientes e Consultas
-Regras desta versão:
-- Sem validações (não verifica CPF, formatos de data/hora, conflitos, etc.)
-- Sem uso de .strip() em qualquer entrada
-- Sem "listar por nascimento" (lista sempre por nome)
-
-Tabelas:
-  PACIENTES(id, nome, cpf, nasc, endereco, telefone)
-  CONSULTAS(id, paciente_id, data_consulta DATE, hora VARCHAR2(5), especialidade, obs)
-"""
-
 import oracledb
 
-# ==========================
-# Conexão
-# ==========================
 def get_connection():
     try:
         return oracledb.connect(
@@ -28,13 +13,7 @@ def get_connection():
         print(f"Erro ao obter a conexão: {e}")
         return None
 
-# ==========================
-# Esquema (DDL)
-# ==========================
 def criar_e_atualizar_tabela():
-    """
-    Cria/garante o esquema. Ignora 'objeto já existe'.
-    """
     ddl = [
         """
         CREATE TABLE pacientes(
@@ -78,9 +57,6 @@ def criar_e_atualizar_tabela():
     finally:
         conn.close()
 
-# ==========================
-# CRUD – Pacientes
-# ==========================
 def criar_paciente():
     conn = get_connection()
     if not conn:
@@ -228,16 +204,12 @@ def excluir_paciente():
         cur.execute("DELETE FROM pacientes WHERE id = :id", {"id": pid})
         conn.commit()
         print("Paciente excluído." if cur.rowcount else "Paciente não encontrado.")
-        # Observação: se houver consultas vinculadas, o FK pode impedir e lançar erro.
     except oracledb.Error as e:
         print(f"Erro ao excluir paciente: {e}")
         conn.rollback()
     finally:
         conn.close()
 
-# ==========================
-# CRUD – Consultas
-# ==========================
 def criar_consulta():
     conn = get_connection()
     if not conn:
@@ -396,9 +368,6 @@ def excluir_consulta():
     finally:
         conn.close()
 
-# ==========================
-# Menus
-# ==========================
 def menu_pacientes():
     while True:
         print("""
@@ -464,7 +433,7 @@ def main():
 Menu Principal
 1. Pacientes
 2. Consultas
-9. Criar/Atualizar esquema (DDL)
+9. Criar/Atualizar tabela 
 0. Sair
 """)
         op = input("Opção: ")
